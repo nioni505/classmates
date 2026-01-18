@@ -134,6 +134,42 @@
       </table>
     </div>
   </div>
+   <script>
+    const classmates = JSON.parse(localStorage.getItem("classmates")) || [];
+
+    function renderTable() {
+      const tbody = document.querySelector("#classmateTable tbody");
+      tbody.innerHTML = "";
+      classmates.forEach((mate, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${mate.name}</td>
+          <td>${mate.notes || ""}</td>
+          <td><button class="delete-btn" onclick="deleteMate(${index})">Remove ❌</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function deleteMate(index) {
+      classmates.splice(index, 1);
+      localStorage.setItem("classmates", JSON.stringify(classmates));
+      renderTable();
+    }
+
+    document.getElementById("classmateForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      const first = document.getElementById("name").value;
+      const notes = document.getElementById("notes").value;
+      classmates.push({ name: first, notes: notes });
+      localStorage.setItem("classmates", JSON.stringify(classmates));
+
+      renderTable();
+      this.reset();
+    });
+
+    renderTable();
+  </script>
  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs } 
@@ -175,5 +211,4 @@
   </script>
 </body>
 </html>
-
 
