@@ -60,7 +60,7 @@
     button {
       padding: 10px;
       background: #ff69b4;
-      color: white;
+      color: rgb(254, 219, 219);
       border: none;
       border-radius: 25px;
       cursor: pointer;
@@ -72,21 +72,28 @@
       transform:scale(1.15);
     }
     table {
-      width: 100%;
+      height: 40px;
+      table-layout: fixed;
+      text-overflow: ellipsis; 
+      white-space: nowrap;
+      overflow: hidden;
+      width:100%;
+      background: #f4f4f4;
       border-collapse: collapse;
       margin-top: 15px;
-      background: #f0fff0;
       border-radius: 10px;
-      overflow: hidden;
     }
     th, td {
-      border: 1px solid #ddd;
+      border: 1px solid #f5e4e4;
       padding: 8px;
       text-align: center;
-    }
+      max-width: 200px; /* limit width */ 
+      overflow: hidden; /* hide overflow */
+      text-overflow: ellipsis; /* show "..." */ 
+      white-space: nowrap; }
     th {
       background-color: #ff69b4;
-      color: white;
+      color: rgb(244, 236, 236);
     }
     .delete-btn {
       background: #ff1493;
@@ -100,20 +107,17 @@
   </style>
 </head>
 <body>
-  <img id =i1 src="hearttt.png"width="150"/>  
   <div class="container">
     <!-- Friendly welcome text -->
     <div class="welcome">
       Hi, I’m Nouha! 🌷 If you’d like to join us in this challenge and share the experience, please fill in the form below 💖
     </div>
-
+    <img src="hearttt.png" id="i1" width =100px/>     
     <div class="form-container">
       <h2>Add Classmate</h2>
       <form id="classmateForm">
-        <input type="text" id="firstname" placeholder="First Name" required>
-        <input type="text" id="lastname" placeholder="Last Name" required>
-        <input type="date" id="birthday" required>
-        <textarea id="notes" placeholder="Write goals, dreams, hobbies..."></textarea>
+        <input type="text" id="name" placeholder="Name" required>
+        <textarea id="notes" placeholder="Write tasks, notes, hobbies..."></textarea>
         <button type="submit">💖 Add 💖</button>
       </form>
 
@@ -121,9 +125,7 @@
       <table id="classmateTable">
         <thead>
           <tr>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Birthday</th>
+            <th>Name</th>
             <th>Notes</th>
             <th>Action</th>
           </tr>
@@ -142,9 +144,7 @@
       classmates.forEach((mate, index) => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${mate.firstname}</td>
-          <td>${mate.lastname}</td>
-          <td>${mate.birthday}</td>
+          <td>${mate.name}</td>
           <td>${mate.notes || ""}</td>
           <td><button class="delete-btn" onclick="deleteMate(${index})">Remove ❌</button></td>
         `;
@@ -160,12 +160,10 @@
 
     document.getElementById("classmateForm").addEventListener("submit", function(event) {
       event.preventDefault();
-      const first = document.getElementById("firstname").value;
-      const last = document.getElementById("lastname").value;
-      const birthday = document.getElementById("birthday").value;
+      const first = document.getElementById("name").value;
       const notes = document.getElementById("notes").value;
 
-      classmates.push({ firstname: first, lastname: last, birthday: birthday, notes: notes });
+      classmates.push({ name: first, notes: notes });
       localStorage.setItem("classmates", JSON.stringify(classmates));
 
       renderTable();
