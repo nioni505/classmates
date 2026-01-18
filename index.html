@@ -134,74 +134,45 @@
       </table>
     </div>
   </div>
+ <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs } 
+      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  <script>
-    const classmates = JSON.parse(localStorage.getItem("classmates")) || [];
+    const firebaseConfig = {
+      apiKey: "AIzaSyBItnplD20kHyWDG77KOm0FJRXcqtJ2Iok",
+      authDomain: "classmates-325e0.firebaseapp.com",
+      projectId: "classmates-325e0",
+      storageBucket: "classmates-325e0.firebasestorage.app",
+      messagingSenderId: "121259796073",
+      appId: "1:121259796073:web:7e232bb13d5132fbe664f8"
+    };
 
-    function renderTable() {
-      const tbody = document.querySelector("#classmateTable tbody");
-      tbody.innerHTML = "";
-      classmates.forEach((mate, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${mate.name}</td>
-          <td>${mate.notes || ""}</td>
-          <td><button class="delete-btn" onclick="deleteMate(${index})">Remove ❌</button></td>
-        `;
-        tbody.appendChild(row);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const form = document.getElementById("classmateForm");
+    const table = document.getElementById("classmatesTable");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const notes = document.getElementById("notes").value;
+      await addDoc(collection(db, "classmates"), { name, notes });
+      loadClassmates(); // refresh table after adding
+    });
+
+    async function loadClassmates() {
+      table.innerHTML = "<tr><th>Name</th><th>Notes</th></tr>";
+      const querySnapshot = await getDocs(collection(db, "classmates"));
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        table.innerHTML += `<tr><td>${data.name}</td><td>${data.notes}</td></tr>`;
       });
     }
 
-    function deleteMate(index) {
-      classmates.splice(index, 1);
-      localStorage.setItem("classmates", JSON.stringify(classmates));
-      renderTable();
-    }
-
-    document.getElementById("classmateForm").addEventListener("submit", function(event) {
-      event.preventDefault();
-      const first = document.getElementById("name").value;
-      const notes = document.getElementById("notes").value;
-
-      classmates.push({ name: first, notes: notes });
-      localStorage.setItem("classmates", JSON.stringify(classmates));
-
-      renderTable();
-      this.reset();
-    });
-
-    renderTable();
+    loadClassmates(); // load on page start
   </script>
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } 
-    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyBItnplD20kHyWDG77KOm0FJRXcqtJ2Iok",
-    authDomain: "classmates-325e0.firebaseapp.comm",
-    projectId: "classmates-325e0",
-    storageBucket: "classmates-325e0.firebasestorage.appm",
-    messagingSenderId: "121259796073",
-    appId: "1:121259796073:web:7e232bb13d5132fbe664f8"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  async function addClassmate(name, notes) {
-  await addDoc(collection(db, "classmates"), { name, notes });
-}
- async function loadClassmates() {
-  const querySnapshot = await getDocs(collection(db, "classmates"));
-  querySnapshot.forEach((doc) => {
-    console.log(doc.id, " => ", doc.data());
-    // render into your table
-  });
-}
-async function removeClassmate(id) {
-  await deleteDoc(doc(db, "classmates", id));
-}
-</script>
 </body>
 </html>
 
