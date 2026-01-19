@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" href="hearttt.png" type="image/x-icon"/>
+<style>
+ body{
+    background:linear-gradient(pink,white);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+ }
+ button{
+    background:linear-gradient(pink,white);
+    border-color: lightpink;
+    position:fixed;
+    bottom:0px;
+    right:0px ;
+ }
+#tr,th{border-style: dashed;
+       border-radius:5px;
+}
+</style>
+ </body>   
+  <title>Saved Classmates</title>
+</head>
+<body>
+  <h1>Saved Classmates</h1>
+  <table id="classmatesTable" border="1">
+    <tr><th>Name</th><th>Notes</th></tr>
+  </table>
+ <button type="submit"><a href="indext2.html">⬅️ Back to Add Classmate</a></button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs } 
+      from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const table = document.getElementById("classmatesTable");
+
+    async function loadClassmates() {
+      table.innerHTML = "<tr><th>Name</th><th>Notes</th></tr>";
+      const querySnapshot = await getDocs(collection(db, "classmates"));
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        table.innerHTML += `<tr><td>${data.name}</td><td>${data.notes}</td></tr>`;
+      });
+    }
+
+    loadClassmates();
+import { collection, addDoc } from "firebase/firestore";
+import { db } from "./firebaseConfig";
+
+async function addClassmate(name, note) {
+  try {
+    await addDoc(collection(db, "classmates"), {
+      name: name,
+      note: note
+    });
+    console.log("Classmate added!");
+  } catch (error) {
+    console.error("Error adding classmate: ", error);
+  }
+}
+import { collection, onSnapshot } from "firebase/firestore";
+
+function listenClassmates() {
+  const classmatesRef = collection(db, "classmates");
+  onSnapshot(classmatesRef, (snapshot) => {
+    const list = document.getElementById("classmatesList");
+    list.innerHTML = ""; // clear old list
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const li = document.createElement("li");
+      li.textContent = `${data.name} - ${data.note}`;
+      list.appendChild(li);
+    });
+  });
+}
+</script>
+</body>
+</html>
